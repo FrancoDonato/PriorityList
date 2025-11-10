@@ -1,10 +1,10 @@
 import './App.css'
+import Contenedor from './componentes/contenedor/Contenedor'
 
 function App() {
 
   return (
-    <>
-    </>
+    <Contenedor></Contenedor>
   )
 }
 
