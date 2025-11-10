@@ -1,9 +1,10 @@
 import React from 'react'
+import Navbar from '../navbar/Navbar'
 
 const Contenedor = () => {
   return (
-    <div>Contenedor</div>
-  )
+    <Navbar></Navbar>
+    )
 }
 
 export default Contenedor
