@@ -1,6 +1,7 @@
 import React from 'react'
 import {styled} from 'styled-components'
 import Login from '../botones/Login'
+import Button from 'react-bootstrap/Button';
 
 
 const Contenedor = styled.div`
@@ -32,6 +33,7 @@ const Navbar = () => {
     <Contenedor>
         <img src="" alt="" />
         <LogBoton>
+        <Button variant="dark"><i class="bi bi-moon"></i></Button>
         <Login></Login>
         </LogBoton>
 
