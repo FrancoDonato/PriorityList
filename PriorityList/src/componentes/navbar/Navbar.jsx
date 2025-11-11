@@ -1,5 +1,7 @@
 import React from 'react'
 import {styled} from 'styled-components'
+import Login from '../botones/Login'
+import Button from 'react-bootstrap/Button';
 
 
 const Contenedor = styled.div`
@@ -17,9 +19,12 @@ width: 15%;
 color: aliceblue;
 `
 
-const Login = styled.button`
-    background-color: #1F283D;
-    color: aliceblue;
+const LogBoton = styled.div`
+    background-color: #151B2B;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
 `
 
 
@@ -27,11 +32,11 @@ const Navbar = () => {
   return (
     <Contenedor>
         <img src="" alt="" />
-        <Botones>
-            <Login>
-                Iniciar Sesion
-            </Login>
-        </Botones>
+        <LogBoton>
+        <Button variant="dark"><i class="bi bi-moon"></i></Button>
+        <Login></Login>
+        </LogBoton>
+
     </Contenedor>
   )
 }
