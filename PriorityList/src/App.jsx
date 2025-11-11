@@ -1,10 +1,17 @@
 import './App.css'
-import Contenedor from './componentes/contenedor/Contenedor'
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Home from "./pages/Home";
+import Admin from "./pages/Admin";
 
 function App() {
 
   return (
-    <Contenedor></Contenedor>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/Admin" element={<Admin />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import {styled} from 'styled-components'
+import Login from '../botones/Login'
 
 
 const Contenedor = styled.div`
@@ -17,7 +18,7 @@ width: 15%;
 color: aliceblue;
 `
 
-const Login = styled.button`
+const LogBoton = styled.button`
     background-color: #1F283D;
     color: aliceblue;
 `
@@ -27,11 +28,7 @@ const Navbar = () => {
   return (
     <Contenedor>
         <img src="" alt="" />
-        <Botones>
-            <Login>
-                Iniciar Sesion
-            </Login>
-        </Botones>
+        <Login></Login>
     </Contenedor>
   )
 }
