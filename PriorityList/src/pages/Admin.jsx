@@ -4,12 +4,12 @@ import Navbar from '../componentes/navbar/Navbar'
 const Admin = () => {
   return (
     <>
-    <Navbar>
-        
-    </Navbar>
-    <p>Pantalla admin</p>
-    </>
+    
+    <Navbar></Navbar>
 
+    <p>Pantalla admin</p>
+
+    </>
     )
 }
 

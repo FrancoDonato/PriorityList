@@ -18,9 +18,12 @@ width: 15%;
 color: aliceblue;
 `
 
-const LogBoton = styled.button`
-    background-color: #1F283D;
-    color: aliceblue;
+const LogBoton = styled.div`
+    background-color: #151B2B;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
 `
 
 
@@ -28,7 +31,10 @@ const Navbar = () => {
   return (
     <Contenedor>
         <img src="" alt="" />
+        <LogBoton>
         <Login></Login>
+        </LogBoton>
+
     </Contenedor>
   )
 }
