@@ -1,27 +1,21 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {styled} from 'styled-components'
 import Login from '../botones/Login'
 import Button from 'react-bootstrap/Button';
 
-
 const Contenedor = styled.div`
 width: 100%;
-height: 14vh;
+height: 20vh;
 display: flex;
 justify-content: space-between;
-background-color: #151B2B;
-`
-
-const Botones = styled.div`
-display: flex;
-padding: 1rem;
-width: 15%;
-color: aliceblue;
+background-color: var(--nav-bg);
+transition: background-color 200ms ease;
 `
 
 const LogBoton = styled.div`
-    background-color: #151B2B;
+    background-color: transparent;
     display: flex;
+    gap: 1rem;
     justify-content: center;
     align-items: center;
     padding: 1rem;
@@ -29,14 +23,27 @@ const LogBoton = styled.div`
 
 
 const Navbar = () => {
+
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))
+  }
+
   return (
     <Contenedor>
-        <img src="" alt="" />
+        <img src="" alt="logo" />
         <LogBoton>
-        <Button variant="dark"><i class="bi bi-moon"></i></Button>
-        <Login></Login>
+            <Button variant={theme === 'dark' ? 'dark' : 'light'} onClick={toggleTheme}>
+              <i className={theme === 'dark' ? 'bi bi-moon' : 'bi bi-sun'}></i>
+            </Button>        
+            <Login />
         </LogBoton>
-
     </Contenedor>
   )
 }

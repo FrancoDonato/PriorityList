@@ -20,7 +20,7 @@ function StateList() {
   return (
       
       <GrupoEstado type="checkbox" value={value} onChange={handleChange}>
-      <ToggleButton variant='outline-light' id="tbg-btn-1" value={1}>
+      <ToggleButton variant='outline-secondary' id="tbg-btn-1" value={1}>
          Asignadas
       </ToggleButton>
       <ToggleButton variant='outline-success' id="tbg-btn-2" value={2}>
