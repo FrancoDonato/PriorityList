@@ -2,6 +2,54 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
+import { styled } from 'styled-components'
+
+const LoginBtn = styled(Button)`
+  background-color: var(--button-bg) !important;
+  color: var(--button-text) !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`
+const ModalStyled = styled(Modal)`
+   .modal-content {
+    background-color: var(--card-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    background-color: transparent;
+    color: var(--text);
+  }
+
+  .modal-title {
+    color: var(--text);
+  }
+
+  /* Botones dentro del modal */
+  .btn-secondary {
+    background-color: 'primary' !important;
+    color: var(--button-text) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+  }
+
+  .btn-primary {
+    background-color: var(--button-bg) !important;
+    color: var(--button-text) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+  }
+
+  .btn-secondary:hover,
+  .btn-primary:hover {
+    background-color: var(--button-bg-hover) !important;
+    opacity: 0.9;
+  }
+`; 
 
 function Login() {
   const [show, setShow] = useState(false);
@@ -10,11 +58,11 @@ function Login() {
 
   return (
     <>
-      <Button variant="dark" onClick={handleShow}>
+      <LoginBtn variant="dark" onClick={handleShow}>
         Iniciar sesion
-      </Button>
+      </LoginBtn>
 
-      <Modal show={show} onHide={handleClose}>
+      <ModalStyled show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Ingrese sus credenciales</Modal.Title>
         </Modal.Header>
@@ -42,14 +90,14 @@ function Login() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button onClick={handleClose}>
             Ingresar
           </Button>
         </Modal.Footer>
-      </Modal>
+      </ModalStyled>
     </>
   );
 }
