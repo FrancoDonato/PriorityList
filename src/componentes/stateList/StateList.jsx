@@ -12,7 +12,6 @@ flex-wrap: wrap;
 gap: 1rem;
 `
 
-
 function StateList() {
   const [value, setValue] = useState([0, 0]);
   const handleChange = (val) => setValue(val);
@@ -20,16 +19,16 @@ function StateList() {
   return (
       
       <GrupoEstado type="checkbox" value={value} onChange={handleChange}>
-      <ToggleButton variant='outline-secondary' id="tbg-btn-1" value={1}>
+      <ToggleButton variant='outline-secondary' id="tbg-btn-1" style={{borderRadius:'8px'}} value={1}>
          Asignadas
       </ToggleButton>
-      <ToggleButton variant='outline-success' id="tbg-btn-2" value={2}>
+      <ToggleButton variant='outline-success' id="tbg-btn-2" style={{borderRadius:'8px'}} value={2}>
          Finalizadas
       </ToggleButton>
-      <ToggleButton variant='outline-warning' id="tbg-btn-3" value={3}>
+      <ToggleButton variant='outline-warning' id="tbg-btn-3" style={{borderRadius:'8px'}} value={3}>
          En proceso
       </ToggleButton>
-      <ToggleButton variant='outline-danger' id="tbg-btn-4" value={4}>
+      <ToggleButton variant='outline-danger' id="tbg-btn-4" style={{borderRadius:'8px'}} value={4}>
          Alta prioridad
       </ToggleButton>
     </GrupoEstado>
