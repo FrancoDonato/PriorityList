@@ -6,10 +6,22 @@ import Button from 'react-bootstrap/Button';
 const Contenedor = styled.div`
 width: 100%;
 height: 20vh;
+padding: 1rem;
 display: flex;
+position: fixed;
+z-index: 1000;
+align-items: center;
 justify-content: space-between;
 background-color: var(--nav-bg);
 transition: background-color 200ms ease;
+box-shadow: var(--shadow-cardContainer-bg);
+`
+
+const Logo = styled.img`
+    height: auto;
+    width: 3rem;
+    margin-left: 1rem;
+    margin-right: auto;
 `
 
 const LogBoton = styled.div`
@@ -37,7 +49,7 @@ const Navbar = () => {
 
   return (
     <Contenedor>
-        <img src="" alt="logo" />
+        <Logo src="./DN.ico" alt="logo" />
         <LogBoton>
             <Button variant={theme === 'dark' ? 'dark' : 'light'} onClick={toggleTheme}>
               <i className={theme === 'dark' ? 'bi bi-moon' : 'bi bi-sun'}></i>

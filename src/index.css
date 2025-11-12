@@ -5,16 +5,24 @@
   --nav-bg: #e7ecf1;     /* fondo navbar (claro) */
   --button-bg: #ffffff;
   --button-text: #0b1220;
+  --scrollbar-track: rgba(255,255,255,0.02);
+  --scrollbar-thumb: rgba(0,0,0,0.12);
+  --scrollbar-thumb-hover: rgba(0,0,0,0.18);
+  --cardContainer-bg: #ffffff;
 }
 
 /* Tema oscuro */
 body[data-theme="dark"] {
   --bg: #1e293b;
-  --cardContainer-bg: #151B2B;
+  --scrollbar-track: rgba(255,255,255,0.03);
+  --scrollbar-thumb: rgba(255,255,255,0.06);
+  --scrollbar-thumb-hover: rgba(255,255,255,0.10);
+  --cardContainer-bg: #0b1220;
   --card-bg: #1e293b;
   --task-bg: #3c4663;
   --text: #e6eef8;
   --nav-bg: #151B2B;     
+  --shadow-cardContainer-bg: 0 6px 8px rgba(169, 169, 169, 0.12);
   --button-bg: #151B2B;
   --button-bg-hover: #34445f;
   --button-text: #e6eef8;
@@ -23,11 +31,15 @@ body[data-theme="dark"] {
 /* Tema claro */
 body[data-theme="light"] {
   --bg: #ffffff;
+  --scrollbar-track: rgba(0,0,0,0.02);
+  --scrollbar-thumb: rgba(0,0,0,0.12);
+  --scrollbar-thumb-hover: rgba(0,0,0,0.18);
   --cardContainer-bg: #e7ecf1;
   --card-bg: #ffffff;
   --task-bg: #f1f5f9;
   --text: #0b1220;
   --nav-bg: #e7ecf1;
+  --shadow-cardContainer-bg: 0 6px 18px rgba(0,0,0,0.12);
   --button-bg: #ffffff;
   --button-bg-hover: #f1f5f9;
   --button-text: #0b1220;
