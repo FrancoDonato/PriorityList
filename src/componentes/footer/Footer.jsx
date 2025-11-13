@@ -13,8 +13,8 @@ const FooterContainer = styled.footer`
 const Footer = () => {
   return (
     <FooterContainer>
-      <p>© 2025 PriorityList. Todos los derechos reservados.</p>
-      <p>Software support.</p>
+      <h5>© 2025 PriorityList. Todos los derechos reservados.</h5>
+      <h6>Franco Gonzalez. Software support. DN Argentina</h6>
     </FooterContainer>
   )
 }

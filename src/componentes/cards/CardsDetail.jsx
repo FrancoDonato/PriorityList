@@ -1,9 +1,12 @@
-import React from 'react'
+import React from 'react';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { styled } from 'styled-components';
+import TaskAdd from '../taskList/TaskAdd';
+import TaskActions from '../taskList/TaskActions';
+import useTasks from '../../hooks/useTasks';
 
 const CardStyled = styled(Card)`
   background-color: var(--card-bg);
@@ -12,24 +15,71 @@ const CardStyled = styled(Card)`
   height: auto;
 `;
 
+const ListGroupStyled = styled(ListGroup)`
+  background-color: var(--card-bg);
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+`;
+
 const TaskItem = styled(ListGroup.Item)`
   background-color: var(--task-bg);
   color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: .5rem .75rem;
+  gap: .5rem;
+`;
+
+const TaskText = styled.span`
+  flex: 1 1 auto;
+  margin-right: .5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const BadgeState = styled.span`
+  font-size: .75rem;
+  padding: .15rem .4rem;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.06);
+  margin-right: .5rem;
 `;
 
 const ModalStyled = styled(Modal)`
-   .modal-content {
+  .modal-content {
+    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
     background-color: var(--card-bg) !important;
     color: var(--text) !important;
     border: 1px solid rgba(0,0,0,0.08);
     box-shadow: 0 6px 18px rgba(0,0,0,0.12);
   }
 
-  .modal-header,
-  .modal-body,
+  .modal-header{
+    background-color: transparent;
+    color: var(--text); 
+    flex: 0 0 auto;
+  }
+
+  .modal-body {
+    display: flex;
+    overflow-y: auto;       
+    justify-content: center;   
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    background-color: transparent;
+    color: var(--text);
+  }
+
   .modal-footer {
     background-color: transparent;
     color: var(--text);
+    flex: 0 0 auto;
   }
 
   .modal-title {
@@ -57,6 +107,16 @@ const ModalStyled = styled(Modal)`
 `; 
 
 function CardsDetail({ show, onHide }) {
+  const {
+    tasks,
+    addTask,
+    deleteTask,
+    editTaskPrompt,
+    cycleState,
+    toggleComplete,
+    setTaskState,
+  } = useTasks([]);
+
   const handleClose = onHide;
 
   return (
@@ -64,20 +124,31 @@ function CardsDetail({ show, onHide }) {
       <Modal.Header closeButton>
         <Modal.Title>Tal dia</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
-          <ListGroup variant="flush">
-            <TaskItem>Tarea 1</TaskItem>
-            <TaskItem>Tarea 2</TaskItem>
-            <TaskItem>Tarea 3</TaskItem>
-          </ListGroup>
+        <CardStyled>
+          <ListGroupStyled variant="flush">
+            {tasks.map((t, i) => (
+              <TaskItem key={t.id ?? i}>
+                <TaskText>{t.text}</TaskText>
+                <BadgeState>{t.state}</BadgeState>
+                <TaskActions
+                  index={i}
+                  isDone={t.state === 'done'}
+                  onComplete={toggleComplete}
+                  onEdit={editTaskPrompt}
+                  onState={cycleState}
+                  onDelete={deleteTask}
+                />
+              </TaskItem>
+            ))}
+          </ListGroupStyled>
+        </CardStyled>
       </Modal.Body>
+
       <Modal.Footer>
-        <Button onClick={handleClose}>
-          Completar tarea
-        </Button>
-        <Button>
-          Agregar
-        </Button>
+        <Button onClick={handleClose}>Cerrar</Button>
+        <TaskAdd onAdd={addTask} />
       </Modal.Footer>
     </ModalStyled>
   );
