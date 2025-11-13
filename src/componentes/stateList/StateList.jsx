@@ -29,7 +29,7 @@ function StateList() {
          En proceso
       </ToggleButton>
       <ToggleButton variant='outline-danger' id="tbg-btn-4" style={{borderRadius:'8px'}} value={4}>
-         Alta prioridad
+         Prioridad
       </ToggleButton>
     </GrupoEstado>
 
