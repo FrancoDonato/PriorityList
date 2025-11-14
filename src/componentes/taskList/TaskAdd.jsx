@@ -1,12 +1,11 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Button from 'react-bootstrap/Button';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import Form from 'react-bootstrap/Form';
-import { styled } from 'styled-components'
+import { styled } from 'styled-components';
 
 const PopoverContainer = styled(Popover)`
-
   .popover-body{
       background-color: var(--card-bg);
       color: var(--text);
@@ -20,39 +19,39 @@ const PopoverContainer = styled(Popover)`
   }
 `;
 
-function TaskAdd({ onAdd }) {
+export default function TaskAdd({ onAdd }) {
   const [show, setShow] = useState(false);
   const [target, setTarget] = useState(null);
   const [value, setValue] = useState('');
   const ref = useRef(null);
 
   const handleClick = (event) => {
-    setShow(!show);
+    setShow(prev => !prev);
     setTarget(event.target);
   };
 
   const handleAdd = (e) => {
-    e.preventDefault();
-    const text = value.trim();
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    const text = (value ?? '').trim();
     if (!text) return;
-    const formatted = text.charAt(0).toUpperCase() + text.slice(1);
-    if (typeof onAdd === 'function') onAdd(formatted);
+    if (typeof onAdd === 'function') onAdd(text);
     setValue('');
     setShow(false);
   };
 
   return (
-    <div ref={ref}>
+    <div ref={ref} style={{ display: 'inline-block' }}>
       <Button onClick={handleClick}>Agregar tarea</Button>
 
       <Overlay
         show={show}
         target={target}
         placement="bottom"
-        container={ref}
+        container={ref.current || document.body}   
+        onHide={() => setShow(false)}
         containerPadding={20}
       >
-        <PopoverContainer id="popover-contained">
+        <PopoverContainer id="popover-contained" onClick={(e) => e.stopPropagation()}>
           <Popover.Header as="h3">Escriba la tarea</Popover.Header>
           <Popover.Body>
             <Form onSubmit={handleAdd} style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
@@ -63,7 +62,7 @@ function TaskAdd({ onAdd }) {
                 onChange={(e) => setValue(e.target.value)}
                 autoFocus
               />
-              <Button type="submit" size="sm" variant="primary">+</Button>
+              <Button type="submit" size="sm">+</Button>
             </Form>
           </Popover.Body>
         </PopoverContainer>
@@ -71,5 +70,3 @@ function TaskAdd({ onAdd }) {
     </div>
   );
 }
-
-export default TaskAdd

@@ -1,10 +1,13 @@
-import React from 'react';
+import { useState } from 'react';
 import { styled } from 'styled-components';
 import Cards from '../cards/Cards';
 import AddCards from '../cards/AddCards';
 import useCards from '../../hooks/useCards';
+import ModalTitle from '../cards/ModalTitle';
+import ModalDeleteCards from '../cards/ModalDeleteCards';
+import EditCardModal from '../cards/EditCardModal';
 
-const CardsContainer = styled.div`
+export const CardsContainer = styled.div`
   width: 70%;
   height: 70vh;
   margin-bottom: 2rem;
@@ -70,21 +73,80 @@ const ContenedorCards = () => {
     { id: 3, title: 'Card 3' },
   ]);
 
+  const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [cardToEdit, setCardToEdit] = useState(null);
+
+  const handleOpenModal = () => setShowModal(true);
+
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleRequestDelete = (id) => {
+    const card = cards.find(c => c.id === id) ?? null;
+    setCardToDelete(card);
+    setShowDeleteModal(true);
+  };
+
+  const handleCancelDelete = () => {
+    setCardToDelete(null);
+    setShowDeleteModal(false);
+  };
+
+  const handleConfirmDelete = (id) => {
+    deleteCard(id);
+    handleCancelDelete();
+  };
+
+  const handleRequestEdit = (id) => {
+    const c = cards.find(x => x.id === id) ?? null;
+    setCardToEdit(c);
+    setShowEditModal(true);
+  };
+
+  const handleConfirmEdit = (id, newTitle) => {
+    editCard(id, { title: newTitle });
+  };
+
+  const handleCloseEdit = () => {
+    setCardToEdit(null);
+    setShowEditModal(false);
+  };
+
   return (
     <>
       <CardsContainer>
-        <AddCards addCard={addCard} />
+        <AddCards addCard={handleOpenModal} />
         {cards.map(card => (
           <Cards
             key={card.id}
             card={card}
-            deleteCard={deleteCard}
+            onRequestEdit={handleRequestEdit}
+            onRequestDelete={handleRequestDelete}
             editCard={editCard}
           />
         ))}
       </CardsContainer>
+      <ModalTitle
+        addCard={addCard}
+        showModal={showModal}
+        handleCloseModal={handleCloseModal}
+      />
+      <ModalDeleteCards
+        show={showDeleteModal}
+        onHide={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        card={cardToDelete}
+      />
+      <EditCardModal
+        show={showEditModal}
+        onHide={handleCloseEdit}
+        onConfirm={handleConfirmEdit}
+        card={cardToEdit}
+      />
     </>
   );
-}
+};
 
 export default ContenedorCards

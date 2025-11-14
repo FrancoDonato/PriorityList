@@ -22,7 +22,7 @@ const ActionBtn = styled(Button)`
   border: 1px solid rgba(0,0,0,0.06) !important;
 `;
 
-export default function TaskActions({ index, isDone = false, onComplete, onEdit, onState, onDelete }) {
+export default function TaskActions({ index, id, isDone = false, onComplete, onEdit, onState, onDelete }) {
   return (
     <ActionGroup>
       <ActionBtn
@@ -34,11 +34,12 @@ export default function TaskActions({ index, isDone = false, onComplete, onEdit,
         <i className={isDone ? 'bi bi-arrow-counterclockwise' : 'bi bi-check-lg'}></i>
       </ActionBtn>
 
-      <ActionBtn size="sm" title="Ver" onClick={() => onState(index)} aria-label={`Ver ${index}`}>
-        <i class="bi bi-exclamation-triangle"></i>   
+      {/* botón para alternar assigned <-> priority: llamar onState pasando id */}
+      <ActionBtn size="sm" title="Priorizar" onClick={() => onState(id ?? index)} aria-label={`Priorizar ${id ?? index}`}>
+        <i className="bi bi-arrow-up-short"></i>
       </ActionBtn>
 
-      <ActionBtn size="sm" title="Editar" onClick={() => onEdit(index)} aria-label={`Editar ${index}`}>
+      <ActionBtn size="sm" title="Editar" onClick={() => onEdit(id)} aria-label={`Editar ${index}`}>
         <i className="bi bi-pencil"></i>
       </ActionBtn>
 
