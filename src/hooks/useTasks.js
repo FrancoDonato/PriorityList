@@ -1,17 +1,23 @@
 import { useState } from 'react';
 
-const CYCLE_STATES = ['assigned', 'priority'];          // ciclo para cycleState
-const TOGGLE_STATES = ['todo', 'in-progress', 'done'];  // ciclo para toggleComplete
+const ASSIGNMENT_STATES = ['assigned', 'priority'];
+const TOGGLE_STATES = ['todo', 'in-progress', 'done'];
 
 function normalizeInitial(initial = []) {
   return initial.map((t, i) => {
     if (typeof t === 'string') {
-      return { id: `${Date.now()}-${i}-${Math.random()}`, text: t, state: 'todo' };
+      return {
+        id: `${Date.now()}-${i}-${Math.random()}`,
+        text: t,
+        status: 'todo',
+        assignment: 'assigned',
+      };
     }
     return {
       id: t.id ?? `${Date.now()}-${i}-${Math.random()}`,
       text: t.text ?? '',
-      state: t.state ?? 'todo',
+      status: TOGGLE_STATES.includes(t.status ?? t.state) ? (t.status ?? t.state) : 'todo',
+      assignment: ASSIGNMENT_STATES.includes(t.assignment ?? t.state) ? (t.assignment ?? t.state) : 'assigned',
     };
   });
 }
@@ -19,86 +25,98 @@ function normalizeInitial(initial = []) {
 export default function useTasks(initial = []) {
   const [tasks, setTasks] = useState(normalizeInitial(initial));
 
+  const findIndex = (arg, list = tasks) => {
+    if (arg == null) return -1;
+    const byId = list.findIndex(t => t.id === arg);
+    if (byId !== -1) return byId;
+    if (typeof arg === 'number' && arg >= 0 && arg < list.length) return arg;
+    return -1;
+  };
+
   const addTask = (text) => {
-    if (!text || !text.trim()) return;
-    const formatted = text.trim().charAt(0).toUpperCase() + text.trim().slice(1);
-    const task = { id: `${Date.now()}-${Math.random()}`, text: formatted, state: 'todo' };
+    if (!text || typeof text !== 'string') return;
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+    const task = { id: `${Date.now()}-${Math.random()}`, text: formatted, status: 'todo', assignment: 'assigned' };
     setTasks(prev => [...prev, task]);
   };
 
-  const deleteTask = (index) => {
-    setTasks(prev => prev.filter((_, i) => i !== index));
+  const deleteTask = (idOrIndex) => {
+    setTasks(prev => {
+      const idx = findIndex(idOrIndex, prev);
+      if (idx === -1) return prev;
+      const copy = [...prev];
+      copy.splice(idx, 1);
+      return copy;
+    });
   };
 
-  const editTask = (index, newText) => {
+  const editTask = (idOrIndex, newText) => {
     if (typeof newText !== 'string') return;
-    const text = newText.trim();
-    if (!text) return;
-    const formatted = text.charAt(0).toUpperCase() + text.slice(1);
-    setTasks(prev => prev.map((t, i) => (i === index ? { ...t, text: formatted } : t)));
-  };
-
-  const editTaskPrompt = (index) => {
-    const current = tasks[index] ?? { text: '' };
-    const updated = window.prompt('Editar tarea', current.text);
-    if (updated === null) return;
-    const trimmed = updated.trim();
+    const trimmed = newText.trim();
     if (!trimmed) return;
     const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-    editTask(index, formatted);
-  };
-
-  // cycleState: cicla entre 'assigned' <-> 'priority' (ignora 'done')
-  const cycleState = (index, forcedState) => {
     setTasks(prev => {
-      if (index < 0 || index >= prev.length) return prev;
+      const idx = findIndex(idOrIndex, prev);
+      if (idx === -1) return prev;
       const copy = [...prev];
-      const current = copy[index];
-
-      if (current.state === 'done') return prev;
-
-      if (typeof forcedState === 'string') {
-        if (!CYCLE_STATES.includes(forcedState)) return prev;
-        copy[index] = { ...current, state: forcedState };
-        return copy;
-      }
-
-      const pos = CYCLE_STATES.indexOf(current.state);
-      const next = pos === -1 ? CYCLE_STATES[0] : CYCLE_STATES[(pos + 1) % CYCLE_STATES.length];
-      copy[index] = { ...current, state: next };
+      copy[idx] = { ...copy[idx], text: formatted };
       return copy;
     });
   };
 
-  // toggleComplete: cicla entre todo -> in-progress -> done -> todo
-  // acepta forcedState opcional (solo si está en TOGGLE_STATES)
-  const toggleComplete = (index, forcedState) => {
+  const cycleState = (idOrIndex, forcedAssignment) => {
     setTasks(prev => {
-      if (index < 0 || index >= prev.length) return prev;
+      const idx = findIndex(idOrIndex, prev);
+      if (idx === -1) return prev;
+      const current = prev[idx];
+      if (!current) return prev;
+      if (current.status === 'done') return prev; 
+      let next;
+      if (typeof forcedAssignment === 'string') {
+        if (!ASSIGNMENT_STATES.includes(forcedAssignment)) return prev;
+        next = forcedAssignment;
+      } else {
+        const pos = ASSIGNMENT_STATES.indexOf(current.assignment);
+        next = pos === -1 ? ASSIGNMENT_STATES[0] : ASSIGNMENT_STATES[(pos + 1) % ASSIGNMENT_STATES.length];
+      }
       const copy = [...prev];
-      const current = copy[index];
+      const updated = { ...current, assignment: next };
+      copy.splice(idx, 1);
+      if (next === 'priority') copy.unshift(updated);
+      else copy.splice(Math.min(idx, copy.length), 0, updated);
+      return copy;
+    });
+  };
 
+  const toggleComplete = (idOrIndex, forcedState) => {
+    setTasks(prev => {
+      const idx = findIndex(idOrIndex, prev);
+      if (idx === -1) return prev;
+      const current = prev[idx];
+      if (!current) return prev;
+      let next;
       if (typeof forcedState === 'string') {
         if (!TOGGLE_STATES.includes(forcedState)) return prev;
-        copy[index] = { ...current, state: forcedState };
-        return copy;
+        next = forcedState;
+      } else {
+        const pos = TOGGLE_STATES.indexOf(current.status);
+        next = pos === -1 ? TOGGLE_STATES[0] : TOGGLE_STATES[(pos + 1) % TOGGLE_STATES.length];
       }
-
-      const pos = TOGGLE_STATES.indexOf(current.state);
-      const next = pos === -1 ? TOGGLE_STATES[0] : TOGGLE_STATES[(pos + 1) % TOGGLE_STATES.length];
-      copy[index] = { ...current, state: next };
+      const copy = [...prev];
+      copy[idx] = { ...current, status: next };
       return copy;
     });
   };
 
-  // setTaskState: asignar cualquier estado explícito (validado)
-  const setTaskState = (index, state) => {
-    if (typeof state !== 'string') return;
+  const setTaskState = (idOrIndex, state) => {
+    if (typeof state !== 'string' || !TOGGLE_STATES.includes(state)) return;
     setTasks(prev => {
-      if (index < 0 || index >= prev.length) return prev;
-      if (!STATE_ORDER.includes(state)) return prev;
+      const idx = findIndex(idOrIndex, prev);
+      if (idx === -1) return prev;
       const copy = [...prev];
-      copy[index] = { ...copy[index], state };
+      copy[idx] = { ...copy[idx], status: state };
       return copy;
     });
   };
@@ -109,9 +127,8 @@ export default function useTasks(initial = []) {
     addTask,
     deleteTask,
     editTask,
-    editTaskPrompt,
-    cycleState,     // assigned <-> priority
-    toggleComplete, // todo -> in-progress -> done -> todo
+    cycleState,     
+    toggleComplete, 
     setTaskState,
   };
 }

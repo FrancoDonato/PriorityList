@@ -24,6 +24,7 @@ body[data-theme="dark"] {
   --text: #e6eef8;
   --nav-bg: #151B2B;     
   --shadow-cardContainer-bg: 0 6px 8px rgba(169, 169, 169, 0.12);
+  --shadow-modalTitle-bg: 0 6px 8px rgba(169, 169, 169, 0.2);
   --button-bg: #151B2B;
   --button-bg-hover: #34445f;
   --button-text: #e6eef8;
@@ -41,6 +42,7 @@ body[data-theme="light"] {
   --text: #0b1220;
   --nav-bg: #e7ecf1;
   --shadow-cardContainer-bg: 0 6px 18px rgba(0,0,0,0.12);
+  --shadow-modalTitle-bg: 0 6px 18px rgba(0, 0, 0, 0.2);
   --button-bg: #ffffff;
   --button-bg-hover: #f1f5f9;
   --button-text: #0b1220;
