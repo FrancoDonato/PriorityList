@@ -1,6 +1,8 @@
-import React from 'react'
-import { styled } from 'styled-components'
-import Cards from '../cards/Cards'
+import React from 'react';
+import { styled } from 'styled-components';
+import Cards from '../cards/Cards';
+import AddCards from '../cards/AddCards';
+import useCards from '../../hooks/useCards';
 
 const CardsContainer = styled.div`
   width: 70%;
@@ -8,7 +10,7 @@ const CardsContainer = styled.div`
   margin-bottom: 2rem;
   gap: 2rem;
   padding: 2rem;
-  padding-right: 16px; /* reserva espacio para la scrollbar interior */
+  padding-right: 16px;
   border-radius: 16px;
   overflow-y: auto;
   display: flex;
@@ -17,30 +19,25 @@ const CardsContainer = styled.div`
   flex-wrap: wrap;
   background-color: var(--cardContainer-bg);
   box-shadow: var(--shadow-cardContainer-bg);
-  position: relative; /* necesario para el pseudo-elemento que dibuja el track */
+  position: relative;
 
-  /* pseudo-elemento que actúa como "track" redondeado */
   &::before {
     content: '';
     position: absolute;
-    top: 12px;               /* ajustar para que no toque los extremos */
+    top: 12px;
     bottom: 12px;
-    right: 8px;              /* centrar respecto a la scrollbar */
-    width: 8px;              /* mismo ancho que el thumb menos el border */
-    background: rgba(0,0,0,0.0);
+    background: var(--scrollbar-track, rgba(0,0,0,0.04));
     border-radius: 999px;
-    pointer-events: none;    /* no interfiere con el scroll */
+    pointer-events: none;
     z-index: 0;
   }
 
-  /* WebKit (Chrome, Edge, Safari) */
   &::-webkit-scrollbar {
     width: 10px;
     height: 10px;
     background: transparent;
   }
 
-  /* dejar el track nativo transparente para que se vea el ::before */
   &::-webkit-scrollbar-track {
     background: transparent;
   }
@@ -57,30 +54,37 @@ const CardsContainer = styled.div`
     background-color: var(--scrollbar-thumb-hover, rgba(0,0,0,0.28));
   }
 
-  /* esquina (cuando hay scroll tanto horizontal como vertical) */
   &::-webkit-scrollbar-corner {
     background: transparent;
     border-radius: 999px;
   }
 
-  /* Firefox */
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb, rgba(0,0,0,0.18)) transparent;
 `
 
 const ContenedorCards = () => {
+  const { cards, addCard, deleteCard, editCard } = useCards([
+    { id: 1, title: 'Card 1' },
+    { id: 2, title: 'Card 2' },
+    { id: 3, title: 'Card 3' },
+  ]);
+
   return (
-    <CardsContainer>
-      <Cards></Cards>
-      <Cards></Cards>
-      <Cards></Cards>
-      <Cards></Cards>
-      <Cards></Cards>
-      <Cards></Cards>
-      <Cards></Cards>
-      <Cards></Cards>
-    </CardsContainer>
-  )
+    <>
+      <CardsContainer>
+        <AddCards addCard={addCard} />
+        {cards.map(card => (
+          <Cards
+            key={card.id}
+            card={card}
+            deleteCard={deleteCard}
+            editCard={editCard}
+          />
+        ))}
+      </CardsContainer>
+    </>
+  );
 }
 
 export default ContenedorCards

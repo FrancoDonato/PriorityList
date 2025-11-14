@@ -20,6 +20,7 @@ body[data-theme="dark"] {
   --cardContainer-bg: #0b1220;
   --card-bg: #1e293b;
   --task-bg: #3c4663;
+  --task-bg-hover: #4b5578;
   --text: #e6eef8;
   --nav-bg: #151B2B;     
   --shadow-cardContainer-bg: 0 6px 8px rgba(169, 169, 169, 0.12);

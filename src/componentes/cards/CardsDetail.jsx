@@ -106,7 +106,7 @@ const ModalStyled = styled(Modal)`
   }
 `; 
 
-function CardsDetail({ show, onHide }) {
+function CardsDetail({ show, onHide, title }) {
   const {
     tasks,
     addTask,
@@ -122,7 +122,7 @@ function CardsDetail({ show, onHide }) {
   return (
     <ModalStyled show={!!show} onHide={handleClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Tal dia</Modal.Title>
+        <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>

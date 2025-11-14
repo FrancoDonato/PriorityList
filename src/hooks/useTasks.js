@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-const STATE_ORDER = ['todo', 'in-progress', 'priority', 'done'];
-const CYCLE_STATES = ['todo', 'in-progress', 'priority']; // estados por los que queremos ciclar
+const CYCLE_STATES = ['assigned', 'priority'];          // ciclo para cycleState
+const TOGGLE_STATES = ['todo', 'in-progress', 'done'];  // ciclo para toggleComplete
 
 function normalizeInitial(initial = []) {
   return initial.map((t, i) => {
@@ -48,18 +48,15 @@ export default function useTasks(initial = []) {
     editTask(index, formatted);
   };
 
-  // cycleState: cicla solo entre todo -> in-progress -> priority -> todo
-  // si la tarea está en 'done' no hace nada
+  // cycleState: cicla entre 'assigned' <-> 'priority' (ignora 'done')
   const cycleState = (index, forcedState) => {
     setTasks(prev => {
       if (index < 0 || index >= prev.length) return prev;
       const copy = [...prev];
       const current = copy[index];
 
-      // si está en done, no se permite ciclar
       if (current.state === 'done') return prev;
 
-      // si nos pasan forcedState, solo aceptarlo si está en CYCLE_STATES
       if (typeof forcedState === 'string') {
         if (!CYCLE_STATES.includes(forcedState)) return prev;
         copy[index] = { ...current, state: forcedState };
@@ -73,16 +70,28 @@ export default function useTasks(initial = []) {
     });
   };
 
-  // toggleComplete: permite marcar/desmarcar 'done'
-  const toggleComplete = (index) => {
-    setTasks(prev => prev.map((t, i) => {
-      if (i !== index) return t;
-      const next = t.state === 'done' ? 'todo' : 'done';
-      return { ...t, state: next };
-    }));
+  // toggleComplete: cicla entre todo -> in-progress -> done -> todo
+  // acepta forcedState opcional (solo si está en TOGGLE_STATES)
+  const toggleComplete = (index, forcedState) => {
+    setTasks(prev => {
+      if (index < 0 || index >= prev.length) return prev;
+      const copy = [...prev];
+      const current = copy[index];
+
+      if (typeof forcedState === 'string') {
+        if (!TOGGLE_STATES.includes(forcedState)) return prev;
+        copy[index] = { ...current, state: forcedState };
+        return copy;
+      }
+
+      const pos = TOGGLE_STATES.indexOf(current.state);
+      const next = pos === -1 ? TOGGLE_STATES[0] : TOGGLE_STATES[(pos + 1) % TOGGLE_STATES.length];
+      copy[index] = { ...current, state: next };
+      return copy;
+    });
   };
 
-  // setTaskState: asignar cualquier estado explícito (se puede usar para 'done')
+  // setTaskState: asignar cualquier estado explícito (validado)
   const setTaskState = (index, state) => {
     if (typeof state !== 'string') return;
     setTasks(prev => {
@@ -101,8 +110,8 @@ export default function useTasks(initial = []) {
     deleteTask,
     editTask,
     editTaskPrompt,
-    cycleState,     // cicla entre todo/in-progress/priority, ignora 'done'
-    toggleComplete, // setea/remueve 'done'
-    setTaskState,   // asigna estado explícito (validado)
+    cycleState,     // assigned <-> priority
+    toggleComplete, // todo -> in-progress -> done -> todo
+    setTaskState,
   };
 }
