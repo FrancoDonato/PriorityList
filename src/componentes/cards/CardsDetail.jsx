@@ -8,7 +8,7 @@ import { styled } from 'styled-components';
 import TaskAdd from '../taskList/TaskAdd';
 import TaskActions from '../taskList/TaskActions';
 import useTasks from '../../hooks/useTasks';
-import ModalDeleteTask from './ModalDeleteTask'; 
+import ModalDeleteTask from '../modals/ModalDeleteTask';
 
 const CardStyled = styled(Card)`
   background-color: transparent;
@@ -24,7 +24,7 @@ const ListGroupStyled = styled(ListGroup)`
   width: 100%;
   border: none;
   flex-direction: column;
-  padding-bottom: 1.5rem; 
+  padding-bottom: 1.5rem;
 `;
 
 const TaskItem = styled(ListGroup.Item)`
@@ -36,9 +36,7 @@ const TaskItem = styled(ListGroup.Item)`
   width: 100%;
   margin-bottom: .5rem;
   padding: .5rem .75rem;
-  z-index: 1;                    
-
-  /* borde visual según el estado */
+  z-index: 1;
   border: ${props => (
     props.$assignment === 'priority' ? '3px solid var(--priority-border, #ff0000) !important' :
     props.$assignment === 'assigned' ? '2px dashed var(--assigned-border, #90caf9) !important' :
@@ -64,104 +62,98 @@ const ModalStyled = styled(Modal)`
     color: var(--text) !important;
     box-shadow: 0 6px 18px rgba(0,0,0,0.12);
   }
-
   .modal-header{
     background-color: transparent;
-    color: var(--text); 
+    color: var(--text);
     flex: 0 0 auto;
   }
-
   .modal-body {
     display: flex;
-    overflow-y: auto;       
-    justify-content: center;   
+    overflow-y: auto;
+    justify-content: center;
     margin-top: 1rem;
     margin-bottom: 1rem;
     background-color: transparent;
     color: var(--text);
   }
-
   .modal-footer {
     background-color: transparent;
     color: var(--text);
     flex: 0 0 auto;
   }
-
   .modal-title {
     color: var(--text);
   }
-
   .btn-secondary {
     background-color: 'primary' !important;
     color: var(--button-text) !important;
     border: 1px solid rgba(0,0,0,0.08) !important;
   }
-
   .btn-primary {
     background-color: var(--button-bg) !important;
     color: var(--button-text) !important;
     border: 1px solid rgba(0,0,0,0.08) !important;
   }
-
   .btn-secondary:hover,
   .btn-primary:hover {
     background-color: var(--button-bg-hover) !important;
     opacity: 0.9;
   }
-`; 
+`;
 
 function CardsDetail({ show, onHide, title }) {
   const {
     tasks,
     addTask,
-    deleteTask,
-    editTask,         
-    editTaskPrompt,
-    cycleState,
-    toggleComplete,
-    setTaskState,
-  } = useTasks([]);
+    editTask,
+    removeTask,
+    toggleStatus,
+    cycleAssignment,
+  } = useTasks();
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
 
-  const handleRequestEdit = (idOrIndex) => {
-    const idx = typeof idOrIndex === 'number' ? tasks.findIndex(t => t.id === idOrIndex) : -1;
-    const task = tasks.find(t => t.id === idOrIndex) ?? (tasks[idx] ?? null);
+  // Editar tarea
+  const handleRequestEdit = (id) => {
+    const task = tasks.find(t => t.id === id);
     setTaskToEdit(task);
     setShowEditModal(true);
   };
 
-  const handleConfirmEdit = (id, newTitle) => {
-    if (typeof editTask === 'function') editTask(id, newTitle);
+  const handleConfirmEdit = (id, newTitle, newDetail) => {
+    editTask(id, { title: newTitle, detail: newDetail });
+    setShowEditModal(false);
+    setTaskToEdit(null);
   };
 
   const handleCloseEdit = () => {
-    setTaskToEdit(null);
     setShowEditModal(false);
+    setTaskToEdit(null);
   };
 
-  const handleClose = onHide;
-
-  const handleRequestDelete = (index) => {
-    const t = tasks[index] ?? null;
-    setTaskToDelete(t ? { index, task: t } : null);
+  // Borrar tarea
+  const handleRequestDelete = (id) => {
+    const task = tasks.find(t => t.id === id);
+    setTaskToDelete(task);
     setShowDeleteModal(true);
   };
 
   const handleCancelDelete = () => {
-    setTaskToDelete(null);
     setShowDeleteModal(false);
+    setTaskToDelete(null);
   };
 
   const handleConfirmDelete = () => {
-    if (taskToDelete?.index != null) {
-      deleteTask(taskToDelete.index);
+    if (taskToDelete?.id) {
+      removeTask(taskToDelete.id);
     }
     handleCancelDelete();
   };
+
+  const handleClose = onHide;
 
   return (
     <ModalStyled show={!!show} onHide={handleClose} centered>
@@ -172,17 +164,16 @@ function CardsDetail({ show, onHide, title }) {
       <Modal.Body>
         <CardStyled>
           <ListGroupStyled variant="flush">
-            {tasks.map((t, i) => (
-              <TaskItem key={t.id ?? i} $assignment={t.assignment}>
-                <TaskText>{t.text}</TaskText>
+            {tasks.map((t) => (
+              <TaskItem key={t.id} $assignment={t.assignment}>
+                <TaskText>{t.title}</TaskText>
                 <TaskActions
-                  index={i}
                   id={t.id}
                   isDone={t.status === 'done'}
-                  onComplete={toggleComplete}
-                  onEdit={handleRequestEdit}    
-                  onState={cycleState}
-                  onDelete={() => handleRequestDelete(i)}
+                  onComplete={() => toggleStatus(t.id)}
+                  onEdit={() => handleRequestEdit(t.id)}
+                  onState={() => cycleAssignment(t.id)}
+                  onDelete={() => handleRequestDelete(t.id)}
                 />
               </TaskItem>
             ))}
@@ -203,12 +194,12 @@ function CardsDetail({ show, onHide, title }) {
         task={taskToEdit}
       />
 
-      {/* modal de confirmación de borrado existente */}
+      {/* modal de confirmación de borrado */}
       <ModalDeleteTask
         show={showDeleteModal}
         onHide={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        task={taskToDelete?.task}
+        task={taskToDelete}
       />
     </ModalStyled>
   );

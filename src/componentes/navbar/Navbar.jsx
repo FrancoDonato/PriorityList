@@ -11,7 +11,7 @@ display: flex;
 position: fixed;
 z-index: 1000;
 align-items: center;
-justify-content: space-between;
+justify-content: space-around;
 background-color: var(--nav-bg);
 transition: background-color 200ms ease;
 box-shadow: var(--shadow-cardContainer-bg);
@@ -20,8 +20,6 @@ box-shadow: var(--shadow-cardContainer-bg);
 const Logo = styled.img`
     height: auto;
     width: 3rem;
-    margin-left: 1rem;
-    margin-right: auto;
 `
 
 const LogBoton = styled.div`
@@ -50,6 +48,7 @@ const Navbar = () => {
   return (
     <Contenedor>
         <Logo src="./DN.ico" alt="logo" />
+          <h2>PriorityList</h2>
         <LogBoton>
             <Button variant={theme === 'dark' ? 'dark' : 'light'} onClick={toggleTheme}>
               <i className={theme === 'dark' ? 'bi bi-moon' : 'bi bi-sun'}></i>

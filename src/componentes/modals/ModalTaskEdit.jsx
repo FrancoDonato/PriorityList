@@ -27,20 +27,18 @@ const ButtonStyled = styled(Button)`
 
 export default function ModalTaskEdit({ show, onHide, onConfirm, task }) {
   const [title, setTitle] = useState('');
+  const [detail, setDetail] = useState('');
 
   useEffect(() => {
-    if (show) {
-      setTitle(task?.text ?? '');
-    }
-  }, [show, task]);
+    setTitle(task?.title ?? '');
+    setDetail(task?.detail ?? '');
+  }, [task]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const trimmed = (title ?? '').trim();
-    if (!trimmed) return;
-    const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-    if (typeof onConfirm === 'function') onConfirm(task?.id, formatted);
-    if (typeof onHide === 'function') onHide();
+    if (!title.trim()) return;
+    onConfirm(task?.id, title.trim().charAt(0).toLocaleUpperCase() + title.trim().slice(1), detail.trim().charAt(0).toLocaleUpperCase() + detail.trim().slice(1));
+    onHide();
   };
 
   return (
@@ -58,6 +56,15 @@ export default function ModalTaskEdit({ show, onHide, onConfirm, task }) {
               onChange={e => setTitle(e.target.value)}
               autoFocus
               required
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Detalle</Form.Label>
+            <Form.Control
+              as="textarea"
+              value={detail}
+              onChange={e => setDetail(e.target.value)}
+              rows={3}
             />
           </Form.Group>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>

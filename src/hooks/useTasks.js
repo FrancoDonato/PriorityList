@@ -1,134 +1,86 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getTasks, createTask, updateTask, deleteTask } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
-const ASSIGNMENT_STATES = ['assigned', 'priority'];
-const TOGGLE_STATES = ['todo', 'in-progress', 'done'];
+export default function useTasks() {
+  const { token } = useAuth();
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-function normalizeInitial(initial = []) {
-  return initial.map((t, i) => {
-    if (typeof t === 'string') {
-      return {
-        id: `${Date.now()}-${i}-${Math.random()}`,
-        text: t,
-        status: 'todo',
-        assignment: 'assigned',
-      };
+  // cargar tareas al tener token
+  useEffect(() => {
+    if (!token) {
+      setTasks([]);
+      return;
     }
-    return {
-      id: t.id ?? `${Date.now()}-${i}-${Math.random()}`,
-      text: t.text ?? '',
-      status: TOGGLE_STATES.includes(t.status ?? t.state) ? (t.status ?? t.state) : 'todo',
-      assignment: ASSIGNMENT_STATES.includes(t.assignment ?? t.state) ? (t.assignment ?? t.state) : 'assigned',
-    };
-  });
-}
-
-export default function useTasks(initial = []) {
-  const [tasks, setTasks] = useState(normalizeInitial(initial));
-
-  const findIndex = (arg, list = tasks) => {
-    if (arg == null) return -1;
-    const byId = list.findIndex(t => t.id === arg);
-    if (byId !== -1) return byId;
-    if (typeof arg === 'number' && arg >= 0 && arg < list.length) return arg;
-    return -1;
-  };
-
-  const addTask = (text) => {
-    if (!text || typeof text !== 'string') return;
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-    const task = { id: `${Date.now()}-${Math.random()}`, text: formatted, status: 'todo', assignment: 'assigned' };
-    setTasks(prev => [...prev, task]);
-  };
-
-  const deleteTask = (idOrIndex) => {
-    setTasks(prev => {
-      const idx = findIndex(idOrIndex, prev);
-      if (idx === -1) return prev;
-      const copy = [...prev];
-      copy.splice(idx, 1);
-      return copy;
-    });
-  };
-
-  const editTask = (idOrIndex, newText) => {
-    if (typeof newText !== 'string') return;
-    const trimmed = newText.trim();
-    if (!trimmed) return;
-    const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-    setTasks(prev => {
-      const idx = findIndex(idOrIndex, prev);
-      if (idx === -1) return prev;
-      const copy = [...prev];
-      copy[idx] = { ...copy[idx], text: formatted };
-      return copy;
-    });
-  };
-
-  const cycleState = (idOrIndex, forcedAssignment) => {
-    setTasks(prev => {
-      const idx = findIndex(idOrIndex, prev);
-      if (idx === -1) return prev;
-      const current = prev[idx];
-      if (!current) return prev;
-      if (current.status === 'done') return prev; 
-      let next;
-      if (typeof forcedAssignment === 'string') {
-        if (!ASSIGNMENT_STATES.includes(forcedAssignment)) return prev;
-        next = forcedAssignment;
-      } else {
-        const pos = ASSIGNMENT_STATES.indexOf(current.assignment);
-        next = pos === -1 ? ASSIGNMENT_STATES[0] : ASSIGNMENT_STATES[(pos + 1) % ASSIGNMENT_STATES.length];
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getTasks();
+        setTasks(data || []);
+      } catch (e) {
+        setError(e.message || 'Error');
+      } finally {
+        setLoading(false);
       }
-      const copy = [...prev];
-      const updated = { ...current, assignment: next };
-      copy.splice(idx, 1);
-      if (next === 'priority') copy.unshift(updated);
-      else copy.splice(Math.min(idx, copy.length), 0, updated);
-      return copy;
-    });
+    })();
+  }, [token]);
+
+  const addTask = async (title) => {
+    if (!title?.trim()) return;
+    try {
+      const t = await createTask(title.trim());
+      setTasks(prev => [t, ...prev]);
+    } catch (e) {
+      setError(e.message || 'Error al agregar tarea');
+    }
   };
 
-  const toggleComplete = (idOrIndex, forcedState) => {
-    setTasks(prev => {
-      const idx = findIndex(idOrIndex, prev);
-      if (idx === -1) return prev;
-      const current = prev[idx];
-      if (!current) return prev;
-      let next;
-      if (typeof forcedState === 'string') {
-        if (!TOGGLE_STATES.includes(forcedState)) return prev;
-        next = forcedState;
-      } else {
-        const pos = TOGGLE_STATES.indexOf(current.status);
-        next = pos === -1 ? TOGGLE_STATES[0] : TOGGLE_STATES[(pos + 1) % TOGGLE_STATES.length];
-      }
-      const copy = [...prev];
-      copy[idx] = { ...current, status: next };
-      return copy;
-    });
+  const editTask = async (id, patch) => {
+    try {
+      const updated = await updateTask(id, patch);
+      setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t));
+    } catch (e) {
+      setError(e.message || 'Error al editar tarea');
+    }
   };
 
-  const setTaskState = (idOrIndex, state) => {
-    if (typeof state !== 'string' || !TOGGLE_STATES.includes(state)) return;
-    setTasks(prev => {
-      const idx = findIndex(idOrIndex, prev);
-      if (idx === -1) return prev;
-      const copy = [...prev];
-      copy[idx] = { ...copy[idx], status: state };
-      return copy;
-    });
+  const removeTask = async (id) => {
+    try {
+      await deleteTask(id);
+      setTasks(prev => prev.filter(t => t.id !== id));
+    } catch (e) {
+      setError(e.message || 'Error al eliminar tarea');
+    }
+  };
+
+  // helpers que esperan la API antes de actualizar el estado
+  const toggleStatus = async (id) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    const order = ['todo', 'in-progress', 'done'];
+    const i = order.indexOf(task.status);
+    const next = order[(i + 1) % order.length];
+    await editTask(id, { status: next });
+  };
+
+  const cycleAssignment = async (id) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task || task.status === 'done') return;
+    const next = task.assignment === 'priority' ? 'assigned' : 'priority';
+    await editTask(id, { assignment: next });
   };
 
   return {
     tasks,
-    setTasks,
+    loading,
+    error,
     addTask,
-    deleteTask,
     editTask,
-    cycleState,     
-    toggleComplete, 
-    setTaskState,
+    removeTask,
+    toggleStatus,
+    cycleAssignment,
   };
 }

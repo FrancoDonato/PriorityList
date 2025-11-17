@@ -3,9 +3,9 @@ import { styled } from 'styled-components';
 import Cards from '../cards/Cards';
 import AddCards from '../cards/AddCards';
 import useCards from '../../hooks/useCards';
-import ModalTitle from '../cards/ModalTitle';
-import ModalDeleteCards from '../cards/ModalDeleteCards';
-import EditCardModal from '../cards/EditCardModal';
+import ModalTitle from '../modals/ModalTitle';
+import ModalDeleteCards from '../modals/ModalDeleteCards';
+import EditCardModal from '../modals/EditCardModal';
 
 export const CardsContainer = styled.div`
   width: 70%;
@@ -69,8 +69,6 @@ export const CardsContainer = styled.div`
 const ContenedorCards = () => {
   const { cards, addCard, deleteCard, editCard } = useCards([
     { id: 1, title: 'Card 1' },
-    { id: 2, title: 'Card 2' },
-    { id: 3, title: 'Card 3' },
   ]);
 
   const [showModal, setShowModal] = useState(false);
