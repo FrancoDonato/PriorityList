@@ -24,7 +24,6 @@ const Home = () => {
         <>
             <Navbar></Navbar>
             <BodyContainer>
-                <Buscador></Buscador>
                 <StateList></StateList>
                 <ContenedorCards></ContenedorCards>
             </BodyContainer>

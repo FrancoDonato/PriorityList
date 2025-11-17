@@ -13,18 +13,20 @@ const ModalStyled = styled(Modal)`
 `;
 
 export default function ModalDeleteCards({ show = false, onHide, onConfirm, card }) {
+  if (!card) return null; // No renderizar si no hay tarjeta seleccionada
+
   return (
     <ModalStyled show={!!show} onHide={onHide} centered>
       <Modal.Header closeButton>
         <Modal.Title>Confirmar eliminación</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        ¿Estás seguro que deseas eliminar la card
-        {card?.title ? ` "${card.title}"` : ''}?
+        ¿Estás seguro que deseas eliminar:
+        {card.title ? ` "${card.title}"` : ' esta tarjeta'}?
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Cancelar</Button>
-        <Button variant="danger" onClick={() => onConfirm(card?.id)}>Eliminar</Button>
+        <Button variant="danger" onClick={() => onConfirm(card.id)}>Eliminar</Button>
       </Modal.Footer>
     </ModalStyled>
   );

@@ -27,7 +27,6 @@ const Admin = () => {
 
                 <Buscador></Buscador>
                 <StateList></StateList>
-                <p>Admin</p>
                 <ContenedorCards></ContenedorCards>
                 <Footer></Footer>
             </BodyContainer>

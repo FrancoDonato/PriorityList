@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { styled } from 'styled-components';
 import CardsDetail from './CardsDetail';
+import ModalDeleteCards from '../modals/ModalDeleteCards';
+import ModalTitle from '../modals/ModalTitle';
 
 const CardStyled = styled(Card)`
   background-color: var(--card-bg);
@@ -31,18 +33,27 @@ const ButtonStyled = styled(Button)`
   }
 `;
 
-function Cards({ card, deleteCard, editCard, onRequestDelete, onRequestEdit }) {
-  const [show, setShow] = useState(false);
+function Cards({ card, deleteCard, onRequestDelete, onRequestEdit }) {
+  const [showDetail, setShowDetail] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [showTitle, setShowTitle] = useState(false);
   const [title, setTitle] = useState(card?.title || 'Card Title');
 
   useEffect(() => {
     setTitle(card?.title || 'Card Title');
   }, [card?.title]);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleCloseDetail = () => setShowDetail(false);
+  const handleShowDetail = () => setShowDetail(true);
+
+  const handleCloseDelete = () => setShowDelete(false);
+  const handleShowDelete = () => setShowDelete(true);
+
+  const handleCloseTitle = () => setShowTitle(false);
+  const handleShowTitle = () => setShowTitle(true);
 
   const handleDelete = () => {
+    handleShowDelete();
     if (typeof onRequestDelete === 'function') {
       onRequestDelete(card.id);
       return;
@@ -51,13 +62,11 @@ function Cards({ card, deleteCard, editCard, onRequestDelete, onRequestEdit }) {
   };
 
   const handleEdit = () => {
-    // preferir abrir el modal via onRequestEdit (padre)
+    handleShowTitle();
     if (typeof onRequestEdit === 'function') {
       onRequestEdit(card.id);
       return;
     }
-    // fallback: prompt sólo si no hay handler del padre
-   
   };
 
   return (
@@ -66,14 +75,16 @@ function Cards({ card, deleteCard, editCard, onRequestDelete, onRequestEdit }) {
         <Card.Body style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <Card.Title style={{ marginBottom: 8 }}>{title}</Card.Title>
           <ButtonGroup>
-            <ButtonStyled onClick={handleShow}><i class="bi bi-eye-fill"></i></ButtonStyled>
-            <ButtonStyled onClick={handleEdit}><i class="bi bi-pen"></i></ButtonStyled>
-            <ButtonStyled onClick={handleDelete}><i class="bi bi-trash3-fill"></i></ButtonStyled>
+            <ButtonStyled onClick={handleShowDetail}><i className="bi bi-eye-fill"></i></ButtonStyled>
+            <ButtonStyled onClick={handleEdit}><i className="bi bi-pen"></i></ButtonStyled>
+            <ButtonStyled onClick={handleDelete}><i className="bi bi-trash3-fill"></i></ButtonStyled>
           </ButtonGroup>
         </Card.Body>
       </CardStyled>
 
-      <CardsDetail show={show} onHide={handleClose} title={title} />
+      <CardsDetail show={showDetail} onHide={handleCloseDetail} title={title} />
+      <ModalDeleteCards show={showDelete} onHide={handleCloseDelete} title={title} />
+      <ModalTitle show={showTitle} onHide={handleCloseTitle} title={title} />
     </>
   );
 }
