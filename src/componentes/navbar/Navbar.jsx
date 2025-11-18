@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {styled} from 'styled-components'
-import Login from '../botones/Login'
+import Login from '../login/Login'
 import Button from 'react-bootstrap/Button';
 
 const Contenedor = styled.div`

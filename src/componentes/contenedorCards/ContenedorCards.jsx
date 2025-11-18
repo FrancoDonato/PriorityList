@@ -67,9 +67,7 @@ export const CardsContainer = styled.div`
 `
 
 const ContenedorCards = () => {
-  const { cards, addCard, deleteCard, editCard } = useCards([
-    { id: 1, title: 'Card 1' },
-  ]);
+  const { cards, addCard, deleteCard, editCard } = useCards();
 
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -115,16 +113,28 @@ const ContenedorCards = () => {
   return (
     <>
       <CardsContainer>
-        <AddCards addCard={handleOpenModal} />
+        {cards === null ? (
+          <p>Para ver las cards debe iniciar sesión.</p>
+        ) : cards.length === 0 ? (
+          <>
+            <AddCards addCard={handleOpenModal} />
+            <p>No hay cards disponibles.</p>
+          </>
+        ) : (
+          <>
+            <AddCards addCard={handleOpenModal} />
+
         {cards.map(card => (
-          <Cards
-            key={card.id}
-            card={card}
-            onRequestEdit={handleRequestEdit}
-            onRequestDelete={handleRequestDelete}
-            editCard={editCard}
-          />
-        ))}
+            <Cards
+              key={card.id}
+              card={card}
+              onRequestEdit={handleRequestEdit}
+              onRequestDelete={handleRequestDelete}
+              editCard={editCard}
+            />
+            ))}
+          </>
+        )}
       </CardsContainer>
       <ModalTitle
         addCard={addCard}

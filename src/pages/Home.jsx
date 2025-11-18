@@ -2,7 +2,6 @@ import React from 'react'
 import Navbar from '../componentes/navbar/Navbar'
 import ContenedorCards from '../componentes/contenedorCards/ContenedorCards'
 import { styled } from "styled-components"
-import Buscador from '../componentes/buscador/Buscador'
 import StateList from '../componentes/stateList/StateList'
 import Footer from '../componentes/footer/Footer'
 

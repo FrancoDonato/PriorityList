@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import { useAuth } from './context/AuthContext';
-import Login from './componentes/botones/Login';
+import Login from './componentes/login/Login';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();

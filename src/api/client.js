@@ -58,3 +58,19 @@ export async function updateTask(id, patch) {
 export async function deleteTask(id) {
   return request(`/api/tasks/${id}`, { method: 'DELETE' });
 }
+
+export async function getCards() {
+  return request('/api/cards');
+}
+
+export async function createCard(title) {
+  return request('/api/cards', { method: 'POST', body: { title } });
+}
+
+export async function deleteCard(id) {
+  return request(`/api/cards/${id}`, { method: 'DELETE' });
+}
+
+export async function editCard(id, patch) {
+  return request(`/api/cards/${id}`, { method: 'PATCH', body: patch });
+}
