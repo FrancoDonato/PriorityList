@@ -1,42 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createCard, getCards, deleteCard as apiDeleteCard, editCard as apiEditCard } from '../api/client';
 
-export default function useCards(initial = []) {
-  const [cards, setCards] = useState(initial);
-  const [activeCardId, setActiveCardId] = useState(null);
+export default function useCards() {
+  const [cards, setCards] = useState([]);
 
-  const addCard = (title) => {
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getCards();
+        setCards(data || []);
+      } catch (e) {
+        setCards(null);
+        console.log("Debe iniciar sesion para ver las cards");
+      }
+    })();
+  }, []);
+
+  const addCard = async (title) => {
     if (!title || !title.trim()) return;
-    const newId = cards.length > 0 ? Math.max(...cards.map(c => c.id)) + 1 : 1;
-    setCards(prev => [
-      ...prev,
-      { id: newId, title: title.trim().charAt(0).toUpperCase() + title.trim().slice(1) }
-    ]);
+    try {
+      const newCard = await createCard(title.trim());
+      setCards(prev => [newCard, ...prev]);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const deleteCard = (id) => {
-    setCards(prev => prev.filter(card => card.id !== id));
-    if (activeCardId === id) setActiveCardId(null);
+  const deleteCard = async (id) => {
+    try {
+      await apiDeleteCard(id);
+      setCards(prev => prev.filter(card => card.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const editCard = (id, newData) => {
-    setCards(prev => prev.map(card => card.id === id ? { ...card, ...newData } : card));
+  const editCard = async (id, newData) => {
+    try {
+      const updated = await apiEditCard(id, newData);
+      setCards(prev => prev.map(card => card.id === id ? { ...card, ...updated } : card));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const showCard = (id) => {
-    setActiveCardId(id);
-  };
-
-  const hideCard = () => {
-    setActiveCardId(null);
-  };
-
-  return {
-    cards,
-    addCard,
-    deleteCard,
-    editCard,
-    activeCardId,
-    showCard,
-    hideCard,
-  };
+  return { cards, addCard, deleteCard, editCard };
 }

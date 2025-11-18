@@ -63,7 +63,7 @@ function Login() {
   const [password, setPassword] = useState('');
 
   // auth
-  const { login, loading, error, user } = useAuth();
+  const { login, logout, loading, error, user } = useAuth();
   const navigate = useNavigate();
 
   // si ya está logueado puedes ocultar el botón o cambiar el texto
@@ -74,8 +74,14 @@ function Login() {
     if (ok) {
       setPassword('');
       navigate('/admin'); // redirige al admin
+      handleClose();
     }
   };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/'); // redirige al inicio
+  }
 
   return (
     <>
@@ -85,8 +91,8 @@ function Login() {
         </LoginBtn>
       )}
       {user && (
-        <LoginBtn variant="dark" disabled>
-          Sesión: {user.username}
+        <LoginBtn variant="dark" onClick={handleLogout}>
+          Cerrar sesión: {user.username}
         </LoginBtn>
       )}
 

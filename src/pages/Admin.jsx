@@ -28,8 +28,8 @@ const Admin = () => {
                 <Buscador></Buscador>
                 <StateList></StateList>
                 <ContenedorCards></ContenedorCards>
-                <Footer></Footer>
             </BodyContainer>
+            <Footer></Footer>
         </>
     )
 }
