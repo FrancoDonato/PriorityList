@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { getTasks, createTask, updateTask, deleteTask } from '../api/client';
+import { getTasks, createTask, updateTask, deleteTask, getTasksByCard } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
-export default function useTasks() {
+export default function useTasks(card_id) {
   const { token } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // cargar tareas al tener token
   useEffect(() => {
-    if (!token) {
+    if (!token || !card_id) {
       setTasks([]);
       return;
     }
@@ -18,7 +17,8 @@ export default function useTasks() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getTasks();
+        // Usa un endpoint que devuelva solo las tareas de la card
+        const data = await getTasksByCard(card_id);
         setTasks(data || []);
       } catch (e) {
         setError(e.message || 'Error');
@@ -26,12 +26,12 @@ export default function useTasks() {
         setLoading(false);
       }
     })();
-  }, [token]);
+  }, [token, card_id]);
 
-  const addTask = async (title) => {
+  const addTask = async ({ title }) => {
     if (!title?.trim()) return;
     try {
-      const t = await createTask(title.trim());
+      const t = await createTask(title.trim().charAt(0).toUpperCase() + title.trim().slice(1), card_id);
       setTasks(prev => [t, ...prev]);
     } catch (e) {
       setError(e.message || 'Error al agregar tarea');

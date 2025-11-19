@@ -101,7 +101,7 @@ const ModalStyled = styled(Modal)`
   }
 `;
 
-function CardsDetail({ show, onHide, title }) {
+function CardsDetail({ show, onHide, card }) {
   const {
     tasks,
     addTask,
@@ -109,7 +109,7 @@ function CardsDetail({ show, onHide, title }) {
     removeTask,
     toggleStatus,
     cycleAssignment,
-  } = useTasks();
+  } = useTasks(card.id);
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -158,7 +158,7 @@ function CardsDetail({ show, onHide, title }) {
   return (
     <ModalStyled show={!!show} onHide={handleClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
+        <Modal.Title>{card?.title ?? 'Card'}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -183,10 +183,9 @@ function CardsDetail({ show, onHide, title }) {
 
       <Modal.Footer>
         <Button onClick={handleClose}>Cerrar</Button>
-        <TaskAdd onAdd={addTask} />
+        <TaskAdd onAdd={addTask} card_id={card?.id} />
       </Modal.Footer>
 
-      {/* modal de edición */}
       <ModalTaskEdit
         show={showEditModal}
         onHide={handleCloseEdit}
@@ -194,7 +193,6 @@ function CardsDetail({ show, onHide, title }) {
         task={taskToEdit}
       />
 
-      {/* modal de confirmación de borrado */}
       <ModalDeleteTask
         show={showDeleteModal}
         onHide={handleCancelDelete}

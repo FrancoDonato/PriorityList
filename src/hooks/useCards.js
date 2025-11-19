@@ -19,7 +19,7 @@ export default function useCards() {
   const addCard = async (title) => {
     if (!title || !title.trim()) return;
     try {
-      const newCard = await createCard(title.trim());
+      const newCard = await createCard(title.trim().charAt(0).toUpperCase() + title.trim().slice(1));
       setCards(prev => [newCard, ...prev]);
     } catch (e) {
       console.error(e);

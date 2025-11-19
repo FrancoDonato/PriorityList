@@ -82,7 +82,7 @@ function Cards({ card, deleteCard, onRequestDelete, onRequestEdit }) {
         </Card.Body>
       </CardStyled>
 
-      <CardsDetail show={showDetail} onHide={handleCloseDetail} title={title} />
+      <CardsDetail show={showDetail} onHide={handleCloseDetail} card={card} />
       <ModalDeleteCards show={showDelete} onHide={handleCloseDelete} title={title} />
       <ModalTitle show={showTitle} onHide={handleCloseTitle} title={title} />
     </>
