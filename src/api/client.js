@@ -47,8 +47,12 @@ export async function getTasks() {
   return request('/api/tasks');
 }
 
-export async function createTask(title) {
-  return request('/api/tasks', { method: 'POST', body: { title } });
+export async function getTasksByCard(card_id) {
+  return request(`/api/cards/${card_id}/tasks`);
+}
+
+export async function createTask(title, card_id) {
+  return request('/api/tasks', { method: 'POST', body: { title, card_id } });
 }
 
 export async function updateTask(id, patch) {
@@ -73,4 +77,8 @@ export async function deleteCard(id) {
 
 export async function editCard(id, patch) {
   return request(`/api/cards/${id}`, { method: 'PATCH', body: patch });
+}
+
+export async function updateCardsOrder(order) {
+  return request('/api/cards/order', { method: 'PATCH', body: { order } });
 }

@@ -19,7 +19,7 @@ const PopoverContainer = styled(Popover)`
   }
 `;
 
-export default function TaskAdd({ onAdd }) {
+export default function TaskAdd({ onAdd, card_id }) {
   const [show, setShow] = useState(false);
   const [target, setTarget] = useState(null);
   const [value, setValue] = useState('');
@@ -33,8 +33,8 @@ export default function TaskAdd({ onAdd }) {
   const handleAdd = (e) => {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     const text = (value ?? '').trim();
-    if (!text) return;
-    if (typeof onAdd === 'function') onAdd(text);
+    if (!text || !card_id) return;
+    if (typeof onAdd === 'function') onAdd({ title: text, card_id });
     setValue('');
     setShow(false);
   };

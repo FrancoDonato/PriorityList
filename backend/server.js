@@ -19,7 +19,8 @@ app.post('/api/auth/login', async (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ error: 'username y password requeridos' });
   }
-  const r = await db.query('SELECT id, username, password_hash FROM users WHERE username=$1', [username]);
+  // Incluye el campo 'role' en la consulta
+  const r = await db.query('SELECT id, username, password_hash, role FROM users WHERE username=$1', [username]);
   const user = r.rows[0];
   if (!user) {
     return res.status(401).json({ error: 'Credenciales inválidas' });
@@ -29,7 +30,8 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(401).json({ error: 'Credenciales inválidas' });
   }
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '2h' });
-  res.json({ token, user: { id: user.id, username: user.username } });
+  // Devuelve el rol en el objeto user
+  res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
 });
 
 // ========== MIDDLEWARE DE AUTENTICACIÓN ==========
@@ -54,7 +56,7 @@ function auth(req, res, next) {
 // GET /api/cards - Obtener todas las cards del usuario
 app.get('/api/cards', auth, async (req, res) => {
   const r = await db.query(
-    'SELECT id, title, created_at FROM cards WHERE user_id=$1 ORDER BY created_at DESC',
+    'SELECT id, title, position, created_at FROM cards WHERE user_id=$1 ORDER BY position ASC',
     [req.userId]
   );
   res.json(r.rows);
@@ -64,9 +66,12 @@ app.get('/api/cards', auth, async (req, res) => {
 app.post('/api/cards', auth, async (req, res) => {
   const { title } = req.body;
   if (!title) return res.status(400).json({ error: 'title requerido' });
+  // Obtén la posición máxima actual
+  const rPos = await db.query('SELECT COALESCE(MAX(position), 0) AS max_pos FROM cards WHERE user_id=$1', [req.userId]);
+  const position = (rPos.rows[0].max_pos || 0) + 1;
   const r = await db.query(
-    'INSERT INTO cards(user_id, title) VALUES($1,$2) RETURNING id, title, created_at',
-    [req.userId, title]
+    'INSERT INTO cards(user_id, title, position) VALUES($1,$2,$3) RETURNING id, title, position, created_at',
+    [req.userId, title, position]
   );
   res.status(201).json(r.rows[0]);
 });
@@ -157,6 +162,17 @@ app.delete('/api/tasks/:id', auth, async (req, res) => {
   const { id } = req.params;
   await db.query('DELETE FROM tasks WHERE user_id=$1 AND id=$2', [req.userId, id]);
   res.status(204).send();
+});
+
+// PATCH /api/cards/order - Actualizar orden de las cards
+app.patch('/api/cards/order', auth, async (req, res) => {
+  const { order } = req.body; // order: [{id: 1, position: 1}, ...]
+  if (!Array.isArray(order)) return res.status(400).json({ error: 'order requerido' });
+  const queries = order.map(({ id, position }) =>
+    db.query('UPDATE cards SET position=$1 WHERE id=$2 AND user_id=$3', [position, id, req.userId])
+  );
+  await Promise.all(queries);
+  res.status(200).json({ success: true });
 });
 
 // ========== INICIAR SERVIDOR ==========

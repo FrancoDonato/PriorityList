@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { styled } from 'styled-components';
 import Cards from '../cards/Cards';
 import AddCards from '../cards/AddCards';
@@ -6,9 +6,11 @@ import useCards from '../../hooks/useCards';
 import ModalTitle from '../modals/ModalTitle';
 import ModalDeleteCards from '../modals/ModalDeleteCards';
 import EditCardModal from '../modals/EditCardModal';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { updateCardsOrder } from '../../api/client'; 
 
 export const CardsContainer = styled.div`
-  width: 70%;
+  width: 80%;
   height: 70vh;
   margin-bottom: 2rem;
   gap: 2rem;
@@ -16,13 +18,12 @@ export const CardsContainer = styled.div`
   padding-right: 16px;
   border-radius: 16px;
   overflow-y: auto;
+  flex-wrap: wrap;
   display: flex;
   justify-content: center;
-  text-align: center;
-  flex-wrap: wrap;
+  align-items: center;
   background-color: var(--cardContainer-bg);
   box-shadow: var(--shadow-cardContainer-bg);
-  position: relative;
 
   &::before {
     content: '';
@@ -68,6 +69,27 @@ export const CardsContainer = styled.div`
 
 const ContenedorCards = () => {
   const { cards, addCard, deleteCard, editCard } = useCards();
+  const [orderedCards, setOrderedCards] = useState(cards);
+
+  useEffect(() => {
+    setOrderedCards(cards);
+  }, [cards]);
+
+  const onDragEnd = async (result) => {
+    if (!result.destination) return;
+    const newOrder = Array.from(orderedCards);
+    const [moved] = newOrder.splice(result.source.index, 1);
+    newOrder.splice(result.destination.index, 0, moved);
+    setOrderedCards(newOrder);
+
+    // Guarda el nuevo orden en la base
+    const orderPayload = newOrder.map((card, idx) => ({ id: card.id, position: idx + 1 }));
+    try {
+      await updateCardsOrder(orderPayload);
+    } catch (e) {
+      console.error('Error actualizando orden de cards', e);
+    }
+  };
 
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -113,28 +135,42 @@ const ContenedorCards = () => {
   return (
     <>
       <CardsContainer>
-        {cards === null ? (
-          <p>Para ver las cards debe iniciar sesión.</p>
-        ) : cards.length === 0 ? (
-          <>
-            <AddCards addCard={handleOpenModal} />
-            <p>No hay cards disponibles.</p>
-          </>
-        ) : (
-          <>
-            <AddCards addCard={handleOpenModal} />
-
-        {cards.map(card => (
-            <Cards
-              key={card.id}
-              card={card}
-              onRequestEdit={handleRequestEdit}
-              onRequestDelete={handleRequestDelete}
-              editCard={editCard}
-            />
-            ))}
-          </>
-        )}
+        <AddCards addCard={handleOpenModal} />
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="cards-droppable" direction="horizontal">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}
+              >
+                {orderedCards.map((card, idx) => (
+                  <Draggable key={card.id} draggableId={String(card.id)} index={idx}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={{
+                          ...provided.draggableProps.style,
+                          opacity: snapshot.isDragging ? 0.7 : 1,
+                        }}
+                      >
+                        <Cards
+                          card={card}
+                          onRequestEdit={handleRequestEdit}
+                          onRequestDelete={handleRequestDelete}
+                          editCard={editCard}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </CardsContainer>
       <ModalTitle
         addCard={addCard}
@@ -157,4 +193,4 @@ const ContenedorCards = () => {
   );
 };
 
-export default ContenedorCards
+export default ContenedorCards;

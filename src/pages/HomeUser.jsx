@@ -1,9 +1,8 @@
 import React from 'react'
 import Navbar from '../componentes/navbar/Navbar'
-import { styled } from "styled-components"
-import Buscador from '../componentes/buscador/Buscador'
-import StateList from '../componentes/stateList/StateList'
 import ContenedorCards from '../componentes/contenedorCards/ContenedorCards'
+import { styled } from "styled-components"
+import StateList from '../componentes/stateList/StateList'
 import Footer from '../componentes/footer/Footer'
 
 const BodyContainer = styled.div`
@@ -19,12 +18,11 @@ const BodyContainer = styled.div`
     align-items: center;
 `
 
-const Admin = () => {
+const Home = () => {
     return (
         <>
             <Navbar></Navbar>
             <BodyContainer>
-                <Buscador></Buscador>
                 <StateList></StateList>
                 <ContenedorCards></ContenedorCards>
             </BodyContainer>
@@ -33,4 +31,4 @@ const Admin = () => {
     )
 }
 
-export default Admin
+export default Home

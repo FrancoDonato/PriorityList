@@ -31,6 +31,10 @@ const LogBoton = styled.div`
     padding: 1rem;
 `
 
+const Title = styled.h2`
+    color: var(--text);
+`
+
 
 const Navbar = () => {
 
@@ -48,7 +52,7 @@ const Navbar = () => {
   return (
     <Contenedor>
         <Logo src="./DN.ico" alt="logo" />
-          <h2>PriorityList</h2>
+          <Title>PriorityList</Title>
         <LogBoton>
             <Button variant={theme === 'dark' ? 'dark' : 'light'} onClick={toggleTheme}>
               <i className={theme === 'dark' ? 'bi bi-moon' : 'bi bi-sun'}></i>
