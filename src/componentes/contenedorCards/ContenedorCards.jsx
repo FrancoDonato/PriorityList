@@ -7,7 +7,7 @@ import ModalTitle from '../modals/ModalTitle';
 import ModalDeleteCards from '../modals/ModalDeleteCards';
 import EditCardModal from '../modals/EditCardModal';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { updateCardsOrder } from '../../api/client'; 
+import { updateCardsOrder } from '../../api/client'; // crea esta función en tu api/client.js
 
 export const CardsContainer = styled.div`
   width: 80%;

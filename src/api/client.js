@@ -82,3 +82,7 @@ export async function editCard(id, patch) {
 export async function updateCardsOrder(order) {
   return request('/api/cards/order', { method: 'PATCH', body: { order } });
 }
+
+export async function getAllTasks() {
+  return request('/api/tasks/all');
+}

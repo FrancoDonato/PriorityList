@@ -1,6 +1,8 @@
 import React from 'react'
-import { Navbar } from 'react-bootstrap'
+import Navbar from '../componentes/navbar/Navbar'
+import { styled } from "styled-components"
 import Footer from '../componentes/footer/Footer'
+import Buscador from '../componentes/buscador/Buscador'
 
 const BodyContainer = styled.div`
     width: 100%;
@@ -20,6 +22,7 @@ const HistorialUser = () => {
     <>
     <Navbar />
     <BodyContainer>
+      <Buscador></Buscador>
         <h2>Historial de Usuario</h2>
     </BodyContainer>
     <Footer />

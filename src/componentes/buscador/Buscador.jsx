@@ -11,8 +11,8 @@ function Buscador() {
   return (
          <GrupoBuscador>
         <Form.Control
-          placeholder="Buscar por Card..."
-          aria-label="Buscador por nombre de card"
+          placeholder="Buscar por Tarea..."
+          aria-label="Buscador por nombre de tarea"
         />
         <Button variant="dark"><i class="bi bi-search"></i></Button>
         <Button variant="dark"><i class="bi bi-x-circle"></i></Button>

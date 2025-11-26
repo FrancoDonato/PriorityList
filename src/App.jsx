@@ -5,6 +5,8 @@ import Admin from "./pages/Admin";
 import HomeUser from "./pages/HomeUser";
 import { useAuth } from './context/AuthContext';
 import Login from './componentes/login/Login';
+import HistorialUser from './pages/HistorialUser';
+import HistorialAdmin from './pages/HistorialAdmin';
 
 function PrivateRoute({ children, roles }) {
   const { user } = useAuth();
@@ -40,6 +42,23 @@ export default function App() {
           element={
             <PrivateRoute roles={['user', 'admin']}>
               <HomeUser />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/HistorialUser"
+          element={
+            <PrivateRoute roles={['user', 'admin']}>
+              <HistorialUser />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/HistorialAdmin"
+          element={
+            <PrivateRoute roles={['admin']}>
+              <HistorialAdmin />
             </PrivateRoute>
           }
         />
