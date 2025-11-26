@@ -110,7 +110,7 @@ app.get('/api/cards/:id/tasks', auth, async (req, res) => {
 // GET /api/tasks - Obtener todas las tareas del usuario
 app.get('/api/tasks', auth, async (req, res) => {
   const r = await db.query(
-    'SELECT id, card_id, title, detail, status, assignment, created_at FROM tasks WHERE user_id=$1 ORDER BY created_at DESC',
+    'SELECT id, card_id, title, detail, status, assignment, created_at, position FROM tasks WHERE user_id=$1 ORDER BY created_at DESC',
     [req.userId]
   );
   res.json(r.rows);
@@ -166,13 +166,25 @@ app.delete('/api/tasks/:id', auth, async (req, res) => {
 
 // PATCH /api/cards/order - Actualizar orden de las cards
 app.patch('/api/cards/order', auth, async (req, res) => {
-  const { order } = req.body; // order: [{id: 1, position: 1}, ...]
+  const { order } = req.body; // [{id, position}, ...]
   if (!Array.isArray(order)) return res.status(400).json({ error: 'order requerido' });
   const queries = order.map(({ id, position }) =>
     db.query('UPDATE cards SET position=$1 WHERE id=$2 AND user_id=$3', [position, id, req.userId])
   );
   await Promise.all(queries);
   res.status(200).json({ success: true });
+});
+
+// Endpoint solo para admin
+app.get('/api/tasks/all', auth, async (req, res) => {
+  if (req.userRole !== 'admin') return res.status(403).json({ error: 'Solo admin' });
+  const r = await db.query(
+    `SELECT t.id, t.title, t.detail, t.status, t.assignment, t.created_at, u.username, t.user_id
+     FROM tasks t
+     JOIN users u ON t.user_id = u.id
+     ORDER BY t.created_at DESC`
+  );
+  res.json(r.rows);
 });
 
 // ========== INICIAR SERVIDOR ==========

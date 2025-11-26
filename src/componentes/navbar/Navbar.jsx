@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import {styled} from 'styled-components'
 import Login from '../login/Login'
 import Button from 'react-bootstrap/Button';
+import VerHistorial from './VerHistorial';
+import { useAuth } from '../../context/AuthContext';
 
 const Contenedor = styled.div`
 width: 100%;
@@ -22,9 +24,10 @@ const Logo = styled.img`
     width: 3rem;
 `
 
-const LogBoton = styled.div`
+const Botonera = styled.div`
     background-color: transparent;
     display: flex;
+    height: 5vh;
     gap: 1rem;
     justify-content: center;
     align-items: center;
@@ -49,16 +52,19 @@ const Navbar = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))
   }
 
+  const { user } = useAuth();
+
   return (
     <Contenedor>
         <Logo src="./DN.ico" alt="logo" />
           <Title>PriorityList</Title>
-        <LogBoton>
+        <Botonera>
             <Button variant={theme === 'dark' ? 'dark' : 'light'} onClick={toggleTheme}>
               <i className={theme === 'dark' ? 'bi bi-moon' : 'bi bi-sun'}></i>
-            </Button>        
+            </Button>
+            {user && <VerHistorial />}
             <Login />
-        </LogBoton>
+        </Botonera>
     </Contenedor>
   )
 }
